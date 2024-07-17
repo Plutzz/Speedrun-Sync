@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Modding;
 using static Mono.Security.X509.X520;
-using RandomizerMod.RandomizerData;
 
 namespace BossTrackerMod
 {
@@ -19,13 +18,6 @@ namespace BossTrackerMod
 
         protected override void OnEnterGame()
         {
-            //Get button value
-            //if (!BossSyncMod.GS.Bosses)
-            //{
-            //    //BossSyncMod.Instance.Log("Bosses Sync not enabled");
-            //    return;
-            //}
-
             hasRecentItems = ModHooks.GetMod("ItemSyncMod") is Mod;
 
             On.HutongGames.PlayMaker.Actions.SetPlayerDataBool.OnEnter += OnSetPlayerDataBoolAction;
@@ -34,21 +26,21 @@ namespace BossTrackerMod
             var readyMetadata = ItemSyncMod.ItemSyncMod.ISSettings.readyMetadata;
             for (int playerid = 0; playerid < readyMetadata.Count; playerid++)
             {
-                BossSyncMod.Instance.SpeedrunSync.SyncPlayers.Add(playerid);
-                BossSyncMod.Instance.Log($"addSpeedrunSyncPlayers playerid[{playerid}]");
+                SpeedrunSyncMod.Instance.SpeedrunSync.SyncPlayers.Add(playerid);
+                SpeedrunSyncMod.Instance.Log($"addSpeedrunSyncPlayers playerid[{playerid}]");
             }
         }
 
         private void OnSetPlayerDataIntAction(On.HutongGames.PlayMaker.Actions.SetPlayerDataInt.orig_OnEnter orig, SetPlayerDataInt self)
         {
             orig(self);
-            BossSyncMod.Instance.Log("Int variable name: " + self.intName.Value + ":" + self.value.Value);
+            //SpeedrunSyncMod.Instance.Log("Int variable name: " + self.intName.Value + ":" + self.value.Value);
             bool settingNail = self.intName.Value.ToLower().Contains("naildamage");
             bool settingGrimmchild = self.intName.Value.ToLower().Contains("grimmchildlevel");
 
-            if((settingNail && BossSyncMod.GS.SyncNailDamage) || (settingGrimmchild && BossSyncMod.GS.SyncGrimmchildUpgrades))
+            if((settingNail && SpeedrunSyncMod.GS.SyncNailDamage) || (settingGrimmchild && SpeedrunSyncMod.GS.SyncGrimmchildUpgrades))
             {
-                BossSyncMod.Instance.Log(ItemSyncMod.ItemSyncMod.Connection?.IsConnected());
+                SpeedrunSyncMod.Instance.Log(ItemSyncMod.ItemSyncMod.Connection?.IsConnected());
                 if (ItemSyncMod.ItemSyncMod.Connection?.IsConnected() != true) return;
                 foreach (var toPlayerId in SyncPlayers)
                 {
@@ -56,7 +48,7 @@ namespace BossTrackerMod
                     ItemSyncMod.ItemSyncMod.Connection.SendData(MESSAGE_LABEL,
                             JsonConvert.SerializeObject("i." + self.intName.Value + "." + self.value.Value),
                             toPlayerId);
-                    BossSyncMod.Instance.LogDebug($"send to id[{toPlayerId}] name[{ItemSyncMod.ItemSyncMod.ISSettings.GetNicknames()[toPlayerId]}]");
+                    SpeedrunSyncMod.Instance.LogDebug($"send to id[{toPlayerId}] name[{ItemSyncMod.ItemSyncMod.ISSettings.GetNicknames()[toPlayerId]}]");
 
 
                 }
@@ -68,17 +60,17 @@ namespace BossTrackerMod
         {
             orig(self);
 
-            BossSyncMod.Instance.Log("Bool name: " + self.boolName.Value + ":" + self.value.Value);
+            //SpeedrunSyncMod.Instance.Log("Bool name: " + self.boolName.Value + ":" + self.value.Value);
 
             // this hook handles most bosses
-            bool settingBrumm = self.boolName.Value.ToLower().Contains("gotbrummsflame") && self.value.Value && BossSyncMod.GS.SyncGrimmchildUpgrades;
-            bool settingBanishment = self.boolName.Value.ToLower().Contains("destroyednightmarelantern") && self.value.Value && BossSyncMod.GS.SyncGrimmchildUpgrades;
+            bool settingBrumm = self.boolName.Value.ToLower().Contains("gotbrummsflame") && self.value.Value && SpeedrunSyncMod.GS.SyncGrimmchildUpgrades;
+            bool settingBanishment = self.boolName.Value.ToLower().Contains("destroyednightmarelantern") && self.value.Value && SpeedrunSyncMod.GS.SyncGrimmchildUpgrades;
             if (!settingBrumm && !settingBanishment)
             {
                 return;
             }
 
-            BossSyncMod.Instance.Log(ItemSyncMod.ItemSyncMod.Connection?.IsConnected());
+            SpeedrunSyncMod.Instance.Log(ItemSyncMod.ItemSyncMod.Connection?.IsConnected());
             if (ItemSyncMod.ItemSyncMod.Connection?.IsConnected() != true) return;
             foreach (var toPlayerId in SyncPlayers)
             {
@@ -86,7 +78,7 @@ namespace BossTrackerMod
                 ItemSyncMod.ItemSyncMod.Connection.SendData(MESSAGE_LABEL,
                         JsonConvert.SerializeObject("b." + self.boolName.Value),
                         toPlayerId);
-                BossSyncMod.Instance.LogDebug($"send to id[{toPlayerId}] name[{ItemSyncMod.ItemSyncMod.ISSettings.GetNicknames()[toPlayerId]}]");
+                SpeedrunSyncMod.Instance.LogDebug($"send to id[{toPlayerId}] name[{ItemSyncMod.ItemSyncMod.ISSettings.GetNicknames()[toPlayerId]}]");
 
 
             }
@@ -95,7 +87,7 @@ namespace BossTrackerMod
         protected override void OnDataReceived(DataReceivedEvent dataReceivedEvent)
         {
             string dataName = JsonConvert.DeserializeObject<string>(dataReceivedEvent.Content);
-            BossSyncMod.Instance.Log($"BossSync get Data[{dataName}] true\n     from[{dataReceivedEvent.From}]");
+            SpeedrunSyncMod.Instance.Log($"BossSync get Data[{dataName}] true\n     from[{dataReceivedEvent.From}]");
 
 
 

@@ -43,7 +43,7 @@ namespace BossTrackerMod
             btPage = new MenuPage(Localize("Boss Tracker"), landingPage);
             btPageTitle = new MenuLabel(btPage, "Select Boss Tracker", MenuLabel.Style.Title);
             btPageTitle.MoveTo(new Vector2(0, 400));
-            btMEF = new(btPage, BossSyncMod.GS);
+            btMEF = new(btPage, SpeedrunSyncMod.GS);
             btButtons = new();
             btGIP = new(btPage, new Vector2(0, 300), 1, 50f, 400f, true, btMEF.Elements.Concat(btButtons).ToArray());
             ConstructButtons();

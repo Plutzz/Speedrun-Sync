@@ -20,7 +20,7 @@ namespace BossTrackerMod
                     interopMods[assembly.GetName().Name] = assembly;
                 }
             }
-            BossSyncMod.Instance.Log($"HasRecentItemsDisplay {HasRecentItemsDisplay()}");
+            SpeedrunSyncMod.Instance.Log($"HasRecentItemsDisplay {HasRecentItemsDisplay()}");
         }
         internal static bool HasRecentItemsDisplay()
         {
